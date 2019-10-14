@@ -2,6 +2,7 @@ import { RefObject } from 'react';
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
+// TODO: Add gamepad keys
 const DirectionalKeyMap: { [key: string]: Direction | undefined } = {
   arrowup: 'up',
   w: 'up',
@@ -15,26 +16,48 @@ const DirectionalKeyMap: { [key: string]: Direction | undefined } = {
 
 export const getDirection = (key: string) => DirectionalKeyMap[key];
 
-export const getNextFocusIndex = (refObjects: RefObject<HTMLDivElement>[], activeIndex: number, direction: Direction) => {
-  if (!refObjects[0].current) {
+export const getNextFocusIndex = (refObjects: RefObject<HTMLDivElement>[], itemsPerRow: number, activeIndex: number, direction: Direction) => {
+  const gridNum = refObjects.length;
+  const currentNode = refObjects[activeIndex].current;
+
+  if (!currentNode) {
     return activeIndex;
   }
 
-  const gridNum = refObjects.length;
-  const baseOffset = refObjects[0].current.offsetTop;
-  const breakIndex = refObjects.findIndex(item => item.current ? item.current.offsetTop > baseOffset : false)
-  const itemsPerRow = breakIndex === -1 ? gridNum : breakIndex;
-
-  const isTopRow = activeIndex <= itemsPerRow - 1;
-  const isBottomRow = activeIndex >= gridNum - itemsPerRow;
-  const isLeftColumn = activeIndex % itemsPerRow === 0;
-  const isRightColumn = activeIndex % itemsPerRow === itemsPerRow - 1 || activeIndex === gridNum - 1;
-
   switch (direction) {
-    case 'up': return isTopRow ? activeIndex : activeIndex - itemsPerRow;
-    case 'down': return isBottomRow ? activeIndex : activeIndex + itemsPerRow;
-    case 'left': return isLeftColumn ? activeIndex : activeIndex - 1;
-    case 'right': return isRightColumn ? activeIndex : activeIndex + 1;
-    default: return activeIndex;
+    case 'up': {
+      const isTopRow = activeIndex <= itemsPerRow - 1;
+      if (!isTopRow) {
+        activeIndex -= itemsPerRow;
+      }
+
+      break;
+    }
+
+    case 'down': {
+      const isBottomRow = activeIndex >= gridNum - itemsPerRow;
+      if (!isBottomRow) {
+        activeIndex += itemsPerRow;
+      }
+      break;
+    }
+
+    case 'left': {
+      const isLeftColumn = activeIndex % itemsPerRow === 0;
+      if (!isLeftColumn) {
+        activeIndex--;
+      }
+      break;
+    }
+
+    case 'right': {
+      const isRightColumn = activeIndex % itemsPerRow === itemsPerRow - 1 || activeIndex === gridNum - 1;
+      if (!isRightColumn) {
+        activeIndex++;
+      }
+      break;
+    }
   }
-}
+
+  return activeIndex;
+};

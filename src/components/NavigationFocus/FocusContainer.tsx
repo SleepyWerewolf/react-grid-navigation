@@ -1,14 +1,40 @@
-import React, { useState, createRef } from 'react';
+import React, { useState, createRef, useMemo } from 'react';
+
 import { FocusItem, IFocusItemProps } from './FocusItem';
-import { getNextFocusIndex, getDirection } from './get-next-focus-index';
+import { getDirection, getNextFocusIndex } from './get-next-focus-index';
+
+interface IColumnConfig {
+  width: string;
+}
+
+interface IRowConfig {
+  height: string;
+}
 
 export interface IFocusContainerProps {
-  items: Omit<IFocusItemProps, 'isActive' | 'ref'>[];
+  gridGap?: string;
+  onDownExit?: () => void;
+  onLeftExit?: () => void;
+  onRightExit?: () => void;
+  onTopExit?: () => void;
+
+  columnConfig: IColumnConfig[];
+  items: Omit<IFocusItemProps, 'isActive' | 'onHover' | 'ref'>[];
+  rowConfig: IRowConfig[];
 }
+
+const generateColumnTemplate = (columnConfig: IColumnConfig[]) =>
+  columnConfig.reduce((accumulator, config) => `${accumulator} ${config.width}`, '');
+
+const generateRowTemplate = (rowConfig: IRowConfig[]) =>
+  rowConfig.reduce((accumulator, config) => `${accumulator} ${config.height}`, '');
 
 export const FocusContainer = (props: IFocusContainerProps) => {
   const [ focusIndex, setFocusIndex ] = useState(0);
+  const gridTemplateColumns = useMemo(() => generateColumnTemplate(props.columnConfig), [props.columnConfig]);
+  const gridTemplateRows = useMemo(() => generateRowTemplate(props.rowConfig), [props.rowConfig]);
   const refs = props.items.map(() => createRef<HTMLDivElement>());
+
   return (
     <div
       className='focus-container'
@@ -16,15 +42,21 @@ export const FocusContainer = (props: IFocusContainerProps) => {
         const direction = getDirection(key.toLowerCase());
 
         if (direction) {
-          const nextFocusIndex = getNextFocusIndex(refs, focusIndex, direction);
-          setFocusIndex(nextFocusIndex);
+          const nextFocusIndex = getNextFocusIndex(refs, props.columnConfig.length, focusIndex, direction);
+          const focusItem = refs[nextFocusIndex];
+
+          if (focusItem.current) {
+            focusItem.current.focus();
+            setFocusIndex(nextFocusIndex);
+          }
         }
       }}
+      ref={div => div && div.focus()}
       style={{
         display: 'grid',
-        gridTemplateColumns: '2fr 1fr 2fr',
-        gridGap: '5px',
-        gridAutoRows: 'minmax(100px, auto)',
+        gridTemplateColumns,
+        gridTemplateRows,
+        gridGap: props.gridGap || '5px',
       }}
       tabIndex={0}
     >
@@ -34,6 +66,11 @@ export const FocusContainer = (props: IFocusContainerProps) => {
 
           isActive={focusIndex === index}
           key={index}
+          onHover={() => {
+            if (focusIndex !== index) {
+              setFocusIndex(index)
+            }
+          }}
           ref={refs[index]}
         />
       )}
