@@ -1,5 +1,3 @@
-import { RefObject } from 'react';
-
 type Direction = 'up' | 'down' | 'left' | 'right';
 
 // TODO: Add gamepad keys
@@ -16,48 +14,66 @@ const DirectionalKeyMap: { [key: string]: Direction | undefined } = {
 
 export const getDirection = (key: string) => DirectionalKeyMap[key];
 
-export const getNextFocusIndex = (refObjects: RefObject<HTMLDivElement>[], itemsPerRow: number, activeIndex: number, direction: Direction) => {
-  const gridNum = refObjects.length;
-  const currentNode = refObjects[activeIndex].current;
+const getItemWidth = (grid: number[], startingIndex: number) => {
+  const originalItem = grid[startingIndex];
 
-  if (!currentNode) {
-    return activeIndex;
+  if (typeof originalItem === 'undefined') {
+    return 0;
   }
+
+  let count = 1;
+  let countIndex = startingIndex;
+
+  while (grid[++countIndex] === originalItem) {
+    count++;
+  }
+
+  return count;
+};
+
+export const getNextFocusIndex = (grid: number[], itemsPerRow: number, activeIndex: number, direction: Direction) => {
+  const gridLength = grid.length;
+  let gridIndex = grid.findIndex(item => item === activeIndex);
 
   switch (direction) {
     case 'up': {
-      const isTopRow = activeIndex <= itemsPerRow - 1;
+      const isTopRow = gridIndex <= itemsPerRow - 1;
       if (!isTopRow) {
-        activeIndex -= itemsPerRow;
+        gridIndex -= itemsPerRow;
       }
 
       break;
     }
 
     case 'down': {
-      const isBottomRow = activeIndex >= gridNum - itemsPerRow;
+      const isBottomRow = gridIndex >= gridLength - itemsPerRow;
       if (!isBottomRow) {
-        activeIndex += itemsPerRow;
+        gridIndex += itemsPerRow;
       }
       break;
     }
 
     case 'left': {
-      const isLeftColumn = activeIndex % itemsPerRow === 0;
+      const isLeftColumn = gridIndex % itemsPerRow === 0;
       if (!isLeftColumn) {
-        activeIndex--;
+        gridIndex--;
       }
       break;
     }
 
     case 'right': {
-      const isRightColumn = activeIndex % itemsPerRow === itemsPerRow - 1 || activeIndex === gridNum - 1;
+      // This variable accounts for grid items that are larger than 1 width
+      const itemWidth = getItemWidth(grid, gridIndex);
+      const trueRightIndex = gridIndex + (itemWidth - 1);
+      const isRightColumn = trueRightIndex % itemsPerRow === itemsPerRow - 1 || /* final item */ trueRightIndex === gridLength - 1;
+
       if (!isRightColumn) {
-        activeIndex++;
+        gridIndex += itemWidth;
       }
+
       break;
     }
   }
 
-  return activeIndex;
+  return gridIndex;
 };
