@@ -11,7 +11,7 @@ interface IRowConfig {
   height: string;
 }
 
-export type ItemsConfig = Omit<IFocusItemProps, 'id' | 'isActive' | 'onHover' | 'ref'>
+export type ItemsConfig = Pick<IFocusItemProps, 'width'>
 
 export interface IFocusContainerProps {
   gridGap?: string;
@@ -39,34 +39,51 @@ const generateRowTemplate = (rowConfig: IRowConfig[]) =>
  * so pseudo-index 3 is just index 2
  */
 const generateGridMapping = (itemsConfig: ItemsConfig[]) => {
-  const gridMapping: number[] = [];
+  const grid: number[] = [];
+  const gridMap = new Map<number, number>();
 
   for (let i = 0; i < itemsConfig.length; i++) {
     const width = itemsConfig[i].width || 1;
     for (let j = 0; j < width; j++) {
-      gridMapping.push(i);
+      if (!gridMap.has(i)) {
+        gridMap.set(i, grid.length);
+      }
+      grid.push(i);
     }
   }
 
-  return gridMapping;
+  return {
+    grid,
+    gridMap,
+  };
 };
+
+const checkIfInvalidConfig = (items: ItemsConfig[], itemsPerRow: number) =>
+  !!items.find(item => item.width && item.width > itemsPerRow);
 
 export const FocusContainer = (props: IFocusContainerProps) => {
   const [ focusIndex, setFocusIndex ] = useState(0);
   const gridTemplateColumns = useMemo(() => generateColumnTemplate(props.columnConfig), [props.columnConfig]);
   const gridTemplateRows = useMemo(() => generateRowTemplate(props.rowConfig), [props.rowConfig]);
-  const gridMapping = useMemo(() => generateGridMapping(props.items), [props.items]);
+  const { grid, gridMap } = useMemo(() => generateGridMapping(props.items), [props.items]);
   const refs = props.items.map(() => createRef<HTMLDivElement>());
+  const itemsPerRow = props.columnConfig.length;
+  const isInvalidConfig = useMemo(() => checkIfInvalidConfig(props.items, itemsPerRow), [props.items, itemsPerRow]);
+
+  if (isInvalidConfig) {
+    throw new Error(`Invalid grid configuration; grid items cannot be longer than ${itemsPerRow} width`);
+  }
 
   return (
     <div
       className='focus-container'
       onKeyDownCapture={({ key }) => {
         const direction = getDirection(key.toLowerCase());
+        const gridIndex = gridMap.get(focusIndex);
 
-        if (direction) {
-          const nextFocusIndex = getNextFocusIndex(gridMapping, props.columnConfig.length, focusIndex, direction);
-          const gridMappingIndex = gridMapping[nextFocusIndex];
+        if (direction && typeof gridIndex !== 'undefined') {
+          const nextFocusIndex = getNextFocusIndex(grid, itemsPerRow, gridIndex, direction);
+          const gridMappingIndex = grid[nextFocusIndex];
           const focusItem = refs[gridMappingIndex];
 
           if (focusItem.current) {
@@ -88,8 +105,9 @@ export const FocusContainer = (props: IFocusContainerProps) => {
         <FocusItem
           {...focusItemProps}
 
-          id={index}
+          id={gridMap.get(index) || index}
           isActive={focusIndex === index}
+          itemsPerRow={itemsPerRow}
           key={index}
           onHover={() => {
             if (focusIndex !== index) {

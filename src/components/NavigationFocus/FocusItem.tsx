@@ -9,17 +9,18 @@ export interface IFocusItemProps {
 
   id: number;
   isActive: boolean;
+  itemsPerRow: number;
   onHover: () => void;
 }
 
-export const FocusItem = forwardRef<HTMLDivElement, IFocusItemProps>((props, ref) => (
+export const FocusItem = forwardRef<HTMLDivElement, IFocusItemProps>((props, ref) =>(
   <div
     className='focus-item'
     onMouseMove={debounce(() => props.onHover(), 100).handler}
     ref={ref}
     style={{
       border: `${props.isActive ? 4 : 1}px solid black`,
-      gridColumn: props.width && `${props.id + 1} / span ${props.width}`,
+      gridColumn: props.width && `${(props.id % props.itemsPerRow) + 1} / span ${props.width}`,
       gridRow: props.height && `${props.id + 1} / span ${props.height}`,
     }}
   >

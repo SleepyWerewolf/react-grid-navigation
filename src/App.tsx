@@ -6,11 +6,10 @@ const App: React.FC = () => {
   return (
     <FocusContainer
       columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
-      rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
-      // gridTemplateColumns = 'repeat(4 1fr)'
-      // gridTemplateRows = 'repeat(2, minmax(250px, auto))'
+      rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)'}]}
       items = {[
         {}, { width: 2 },
+        { width: 2 }, {},
         {}, {}, {},
       ]}
     />
