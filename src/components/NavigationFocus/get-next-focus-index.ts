@@ -45,7 +45,7 @@ const getItemWidth = (grid: IGridItem[], startingIndex: number) => {
 };
 
 const isLeftColumn = (itemsPerRow: number, index: number) => index % itemsPerRow === 0;
-const isRightColumn = (gridLength: number, itemsPerRow: number, index: number) =>  index % itemsPerRow === itemsPerRow - 1 || /* final item */ index === gridLength - 1;
+const isRightMostColumn = (gridLength: number, itemsPerRow: number, index: number) =>  index % itemsPerRow === itemsPerRow - 1 || /* final item */ index === gridLength - 1;
 
 const getLeftMostIndex = (grid: IGridItem[], index: number) => {
   const originalItem = grid[index].index;
@@ -117,14 +117,28 @@ export const getNextFocusIndex = (grid: IGridItem[], itemsPerRow: number, active
       // const itemWidth = getItemWidth(grid, activeIndex);
       // const trueRightIndex = activeIndex + (itemWidth - 1);
 
-      if (!isRightColumn(gridLength, itemsPerRow, activeIndex)) {
-        let countIndex = activeIndex + 1;
-
-        while (!isRightColumn(gridLength, itemsPerRow, countIndex) && (grid[countIndex].isDisabled || grid[countIndex].index === grid[activeIndex].index)) {
-          countIndex++;
+      if (!isRightMostColumn(gridLength, itemsPerRow, activeIndex)) {
+        for (let i = activeIndex % itemsPerRow; i <= itemsPerRow; i++) {
+          const offset = activeIndex + i - 1;
+          if (!grid[offset].isDisabled && grid[offset].index !== grid[activeIndex].index) {
+            console.log(offset);
+            activeIndex = offset;
+            break;
+          }
         }
+        // while (!isRightMostColumn(gridLength, itemsPerRow, countIndex) && grid[countIndex].isDisabled && grid[countIndex].index === grid[activeIndex].index) {
+        //   countIndex++;
+        // }
 
-        activeIndex = countIndex;
+        // while (!isRightMostColumn(gridLength, itemsPerRow, countIndex) && (grid[countIndex].isDisabled || grid[countIndex].index === grid[activeIndex].index)) {
+        //   console.log(countIndex);
+        //   countIndex++;
+        // }
+
+        // console.log(newIndex);
+        // if (newIndex) {
+        //   activeIndex = newIndex;
+        // }
       }
 
       break;
@@ -133,3 +147,9 @@ export const getNextFocusIndex = (grid: IGridItem[], itemsPerRow: number, active
 
   return activeIndex;
 };
+
+// const getRightMove = (grid: IGridItem[], itemsPerRow: number, activeIndex: number, currentIndex: number) => {
+//   if (isRightMostColumn(grid.length, itemsPerRow, currentIndex) &&) {
+
+//   }
+// };

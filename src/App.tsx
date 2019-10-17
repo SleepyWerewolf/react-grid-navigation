@@ -33,7 +33,7 @@ const App: React.FC = () => {
         columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
         rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
         items={[
-          {}, { width: 2 }, {},
+          {}, { width: 2 }, { shouldDisable: true },
           { width: 2, shouldDisable: true }, {}, {},
           { shouldDisable: true }, {}, { shouldDisable: true }, {},
         ]}
