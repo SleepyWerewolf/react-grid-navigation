@@ -9,8 +9,8 @@ const App: React.FC = () => {
       rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)'}]}
       items = {[
         {}, { width: 2 },
-        { width: 2 }, {},
-        {}, {}, {},
+        { width: 2, shouldDisable: true }, {},
+        { shouldDisable: true }, {}, { shouldDisable: true },
       ]}
     />
   );

@@ -11,7 +11,9 @@ interface IRowConfig {
   height: string;
 }
 
-export type ItemsConfig = Pick<IFocusItemProps, 'width'>
+export type ItemsConfig = Pick<IFocusItemProps, 'width'> & {
+  shouldDisable?: boolean;
+};
 
 export interface IFocusContainerProps {
   gridGap?: string;
@@ -31,6 +33,12 @@ const generateColumnTemplate = (columnConfig: IColumnConfig[]) =>
 const generateRowTemplate = (rowConfig: IRowConfig[]) =>
   rowConfig.reduce((accumulator, config) => `${accumulator} ${config.height}`, '');
 
+
+export interface IGridItem {
+  index: number;
+  isDisabled: boolean;
+}
+
 /**
  * In order to accomodate multi-layout grids,
  * we need to create an intermediate map that keeps track
@@ -39,7 +47,7 @@ const generateRowTemplate = (rowConfig: IRowConfig[]) =>
  * so pseudo-index 3 is just index 2
  */
 const generateGridMapping = (itemsConfig: ItemsConfig[]) => {
-  const grid: number[] = [];
+  const grid: IGridItem[] = [];
   const gridMap = new Map<number, number>();
 
   for (let i = 0; i < itemsConfig.length; i++) {
@@ -48,7 +56,10 @@ const generateGridMapping = (itemsConfig: ItemsConfig[]) => {
       if (!gridMap.has(i)) {
         gridMap.set(i, grid.length);
       }
-      grid.push(i);
+      grid.push({
+        index: i,
+        isDisabled: !!itemsConfig[i].shouldDisable,
+      });
     }
   }
 
@@ -58,6 +69,7 @@ const generateGridMapping = (itemsConfig: ItemsConfig[]) => {
   };
 };
 
+// TODO: Improve to check for right amount of columns too
 const checkIfInvalidConfig = (items: ItemsConfig[], itemsPerRow: number) =>
   !!items.find(item => item.width && item.width > itemsPerRow);
 
@@ -83,7 +95,7 @@ export const FocusContainer = (props: IFocusContainerProps) => {
 
         if (direction && typeof gridIndex !== 'undefined') {
           const nextFocusIndex = getNextFocusIndex(grid, itemsPerRow, gridIndex, direction);
-          const gridMappingIndex = grid[nextFocusIndex];
+          const gridMappingIndex = grid[nextFocusIndex].index;
           const focusItem = refs[gridMappingIndex];
 
           if (focusItem.current) {
@@ -107,6 +119,7 @@ export const FocusContainer = (props: IFocusContainerProps) => {
 
           id={gridMap.get(index) || index}
           isActive={focusIndex === index}
+          isDisabled={!!focusItemProps.shouldDisable}
           itemsPerRow={itemsPerRow}
           key={index}
           onHover={() => {
