@@ -45,7 +45,7 @@ const getItemWidth = (grid: IGridItem[], startingIndex: number) => {
 };
 
 const isLeftColumn = (itemsPerRow: number, index: number) => index % itemsPerRow === 0;
-// const isRightColumn = (gridLength: number, itemsPerRow: number, index: number) =>  index % itemsPerRow === itemsPerRow - 1 || /* final item */ index === gridLength - 1;
+const isRightColumn = (gridLength: number, itemsPerRow: number, index: number) =>  index % itemsPerRow === itemsPerRow - 1 || /* final item */ index === gridLength - 1;
 
 const getLeftMostIndex = (grid: IGridItem[], index: number) => {
   const originalItem = grid[index].index;
@@ -100,20 +100,31 @@ export const getNextFocusIndex = (grid: IGridItem[], itemsPerRow: number, active
     }
 
     case 'left': {
-      if (!isLeftColumn(itemsPerRow, activeIndex) && !grid[activeIndex - 1].isDisabled) {
-        activeIndex--;
+      if (!isLeftColumn(itemsPerRow, activeIndex)) {
+        let countIndex = activeIndex - 1;
+
+        while (!isLeftColumn(itemsPerRow, countIndex) && (grid[countIndex].isDisabled || grid[countIndex].index === grid[activeIndex].index)) {
+          countIndex--;
+        }
+
+        activeIndex = countIndex;
       }
       break;
     }
 
     case 'right': {
       // This variable accounts for grid items that are larger than 1 width
-      const itemWidth = getItemWidth(grid, activeIndex);
-      const trueRightIndex = activeIndex + (itemWidth - 1);
-      const isRightColumn = trueRightIndex % itemsPerRow === itemsPerRow - 1 || /* final item */ trueRightIndex === gridLength - 1;
+      // const itemWidth = getItemWidth(grid, activeIndex);
+      // const trueRightIndex = activeIndex + (itemWidth - 1);
 
-      if (!isRightColumn && !grid[activeIndex + 1].isDisabled) {
-        activeIndex += itemWidth;
+      if (!isRightColumn(gridLength, itemsPerRow, activeIndex)) {
+        let countIndex = activeIndex + 1;
+
+        while (!isRightColumn(gridLength, itemsPerRow, countIndex) && (grid[countIndex].isDisabled || grid[countIndex].index === grid[activeIndex].index)) {
+          countIndex++;
+        }
+
+        activeIndex = countIndex;
       }
 
       break;
