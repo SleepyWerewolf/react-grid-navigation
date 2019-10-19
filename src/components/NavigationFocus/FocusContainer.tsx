@@ -101,7 +101,8 @@ export const FocusContainer = (props: IFocusContainerProps) => {
         const gridIndex = gridMap.get(focusIndex);
 
         if (direction && typeof gridIndex !== 'undefined') {
-          const nextFocusIndex = getNextFocusIndex(grid, itemsPerRow, gridIndex, direction);
+          const nextGridIndex = getNextFocusIndex(grid, itemsPerRow, gridIndex, direction);
+          const nextFocusIndex = grid[nextGridIndex].index;
 
           if (nextFocusIndex === focusIndex) {
             switch (direction) {
@@ -129,12 +130,11 @@ export const FocusContainer = (props: IFocusContainerProps) => {
             return;
           }
 
-          const gridMappingIndex = grid[nextFocusIndex].index;
-          const focusItem = refs[gridMappingIndex];
+          const focusItem = refs[nextFocusIndex];
 
           if (focusItem.current) {
             focusItem.current.focus();
-            setFocusIndex(gridMappingIndex);
+            setFocusIndex(nextFocusIndex);
           }
         }
       }}
