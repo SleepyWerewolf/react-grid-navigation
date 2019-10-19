@@ -2,6 +2,8 @@ import React, { useState, createRef, useMemo } from 'react';
 
 import { FocusItem, IFocusItemProps } from './FocusItem';
 import { getDirection, getNextFocusIndex } from './get-next-focus-index';
+import { useFocus } from '../../hooks/use-focus';
+import { debounce } from '../../utils/debounce';
 
 export interface IColumnConfig {
   width: string;
@@ -23,6 +25,7 @@ export interface IFocusContainerProps {
   onTopExit?: () => void;
 
   columnConfig: IColumnConfig[];
+  isFocused: boolean;
   items: ItemsConfig[];
   rowConfig: IRowConfig[];
 }
@@ -75,12 +78,17 @@ const checkIfInvalidConfig = (items: ItemsConfig[], itemsPerRow: number) =>
 
 export const FocusContainer = (props: IFocusContainerProps) => {
   const [ focusIndex, setFocusIndex ] = useState(0);
+  const [ containerRef, setContainerFocus ] = useFocus();
   const gridTemplateColumns = useMemo(() => generateColumnTemplate(props.columnConfig), [props.columnConfig]);
   const gridTemplateRows = useMemo(() => generateRowTemplate(props.rowConfig), [props.rowConfig]);
   const { grid, gridMap } = useMemo(() => generateGridMapping(props.items), [props.items]);
   const refs = props.items.map(() => createRef<HTMLDivElement>());
   const itemsPerRow = props.columnConfig.length;
   const isInvalidConfig = useMemo(() => checkIfInvalidConfig(props.items, itemsPerRow), [props.items, itemsPerRow]);
+
+  if (props.isFocused) {
+    setContainerFocus();
+  }
 
   if (isInvalidConfig) {
     throw new Error(`Invalid grid configuration; grid items cannot be longer than ${itemsPerRow} width`);
@@ -95,6 +103,33 @@ export const FocusContainer = (props: IFocusContainerProps) => {
 
         if (direction && typeof gridIndex !== 'undefined') {
           const nextFocusIndex = getNextFocusIndex(grid, itemsPerRow, gridIndex, direction);
+
+          if (nextFocusIndex === focusIndex) {
+            switch (direction) {
+              case 'down': {
+                props.onDownExit && props.onDownExit();
+                break;
+              }
+
+              case 'left': {
+                props.onLeftExit && props.onLeftExit();
+                break;
+              }
+
+              case 'right': {
+                props.onRightExit && props.onRightExit();
+                break;
+              }
+
+              case 'up': {
+                props.onTopExit && props.onTopExit();
+                break;
+              }
+            }
+
+            return;
+          }
+
           const gridMappingIndex = grid[nextFocusIndex].index;
           const focusItem = refs[gridMappingIndex];
 
@@ -104,12 +139,17 @@ export const FocusContainer = (props: IFocusContainerProps) => {
           }
         }
       }}
-      ref={div => div && div.focus()}
+      onMouseMove={debounce(() => setContainerFocus(), 100).handler}
+      ref={containerRef as React.RefObject<HTMLDivElement>}
       style={{
+        border: '3px solid black',
         display: 'grid',
         gridTemplateColumns,
         gridTemplateRows,
         gridGap: props.gridGap || '5px',
+        margin: '10px',
+        padding: '5px',
+        width: '100%',
       }}
       tabIndex={0}
     >
