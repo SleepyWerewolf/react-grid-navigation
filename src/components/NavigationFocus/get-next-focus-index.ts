@@ -71,7 +71,7 @@ export const getNextFocusIndex = (grid: IGridItem[], itemsPerRow: number, active
           const itemWidth = getItemWidth(grid, activeIndex);
           const leftMostIndex = getLeftMostIndex(grid, activeIndex);
           if (isLeftMostColumn(itemsPerRow, leftMostIndex)) {
-            activeIndex = leftMostIndex + itemWidth;
+            activeIndex = leftMostIndex - itemWidth;
           } else {
             activeIndex--;
           }

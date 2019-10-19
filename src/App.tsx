@@ -45,7 +45,10 @@ const App: React.FC = () => {
           { width: 2, shouldDisable: true }, {}, {},
           { shouldDisable: true }, {}, { shouldDisable: true }, {},
         ]}
+        onDownExit={() => setFocusIndex(3)}
+        onTopExit={() => setFocusIndex(1)}
       />
+
       <h1>Inter-Grid Focus</h1>
       <div
         style={{
@@ -64,7 +67,9 @@ const App: React.FC = () => {
             {}, {},
             {}, {},
           ]}
+          onDownExit={() => setFocusIndex(5)}
           onRightExit={() => setFocusIndex(4)}
+          onTopExit={() => setFocusIndex(2)}
         />
 
         <FocusContainer
@@ -77,11 +82,48 @@ const App: React.FC = () => {
             {}, {},
             {}, {},
           ]}
+          onDownExit={() => setFocusIndex(6)}
           onLeftExit={() => setFocusIndex(3)}
+          onTopExit={() => setFocusIndex(2)}
         />
       </div>
 
       <h1>Let's put it all together!</h1>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+        }}
+      >
+        <FocusContainer
+          columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
+          rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
+          isFocused={focusIndex === 5}
+          items={[
+            { width: 2 },
+            {}, {},
+            {}, { shouldDisable: true },
+            {}, {},
+          ]}
+          onRightExit={() => setFocusIndex(6)}
+          onTopExit={() => setFocusIndex(3)}
+        />
+
+        <FocusContainer
+          columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
+          rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
+          isFocused={focusIndex === 6}
+          items={[
+            {}, {},
+            {}, {},
+            { width: 2, shouldDisable: true },
+            {}, {},
+          ]}
+          onLeftExit={() => setFocusIndex(5)}
+          onTopExit={() => setFocusIndex(4)}
+        />
+      </div>
     </Fragment>
   );
 }
