@@ -1,7 +1,8 @@
 import React, { useState, createRef, useMemo } from 'react';
 
+import { getDirection } from './directions';
 import { FocusItem, IFocusItemProps } from './FocusItem';
-import { getDirection, getNextFocusIndex } from './get-next-focus-index';
+import { getNextGridIndex } from './get-next-grid-index';
 import { useFocus } from '../../hooks/use-focus';
 
 export interface IColumnConfig {
@@ -101,7 +102,7 @@ export const FocusContainer = (props: IFocusContainerProps) => {
         const gridIndex = gridMap.get(focusIndex);
 
         if (direction && typeof gridIndex !== 'undefined') {
-          const nextGridIndex = getNextFocusIndex(grid, itemsPerRow, gridIndex, direction);
+          const nextGridIndex = getNextGridIndex(grid, itemsPerRow, gridIndex, direction);
           const nextFocusIndex = grid[nextGridIndex].index;
 
           if (nextFocusIndex === focusIndex) {
