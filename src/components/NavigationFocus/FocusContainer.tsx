@@ -43,7 +43,7 @@ export interface IGridItem {
 }
 
 /**
- * In order to accomodate multi-layout grids,
+ * In order to accomodate variable-layout grids,
  * we need to create an intermediate map that keeps track
  * of the "pseudo-index" of an item that spans multiple indices
  * (consider case where item takes 2 grids, but is a single DOM Node)
