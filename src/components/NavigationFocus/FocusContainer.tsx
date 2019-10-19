@@ -3,7 +3,6 @@ import React, { useState, createRef, useMemo } from 'react';
 import { FocusItem, IFocusItemProps } from './FocusItem';
 import { getDirection, getNextFocusIndex } from './get-next-focus-index';
 import { useFocus } from '../../hooks/use-focus';
-import { debounce } from '../../utils/debounce';
 
 export interface IColumnConfig {
   width: string;
@@ -139,7 +138,6 @@ export const FocusContainer = (props: IFocusContainerProps) => {
           }
         }
       }}
-      onMouseMove={debounce(() => setContainerFocus(), 100).handler}
       ref={containerRef as React.RefObject<HTMLDivElement>}
       style={{
         border: '3px solid black',
