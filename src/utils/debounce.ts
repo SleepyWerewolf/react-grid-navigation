@@ -6,8 +6,8 @@ export const debounce = (callback: Function, timeoutMs: number, shouldHandleFirs
     handler: (...args: any[]) => {
       clearTimeout(timeoutHandle);
       const now = performance.now();
-      const dt = now - lastCall;
-      const shouldCallNow = dt > timeoutMs;
+      const delta = now - lastCall;
+      const shouldCallNow = delta > timeoutMs;
 
       if (shouldCallNow) {
         lastCall = now;

@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
+
 import './App.css';
-import { FocusContainer } from './components/NavigationFocus/FocusContainer';
+import { FocusGrid } from './components/FocusGrid';
 
 const App: React.FC = () => {
   const [ focusIndex, setFocusIndex ] = useState(0);
@@ -8,7 +9,7 @@ const App: React.FC = () => {
   return (
     <Fragment>
       <h1>Standard 4x4 Grid</h1>
-      <FocusContainer
+      <FocusGrid
         columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
         rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
         isFocused={focusIndex === 0}
@@ -21,8 +22,8 @@ const App: React.FC = () => {
         onDownExit={() => setFocusIndex(1)}
       />
 
-      <h1>Variable-Layout Grid</h1>
-      <FocusContainer
+      <h1>Variable-Width Layout Grid</h1>
+      <FocusGrid
         columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
         rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
         isFocused={focusIndex === 1}
@@ -36,7 +37,7 @@ const App: React.FC = () => {
       />
 
       <h1>Disabled Grid Items</h1>
-      <FocusContainer
+      <FocusGrid
         columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
         rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
         isFocused={focusIndex === 2}
@@ -57,7 +58,7 @@ const App: React.FC = () => {
           justifyContent: 'space-around',
         }}
       >
-        <FocusContainer
+        <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
           rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
           isFocused={focusIndex === 3}
@@ -72,7 +73,7 @@ const App: React.FC = () => {
           onTopExit={() => setFocusIndex(2)}
         />
 
-        <FocusContainer
+        <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
           rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
           isFocused={focusIndex === 4}
@@ -96,7 +97,7 @@ const App: React.FC = () => {
           justifyContent: 'space-around',
         }}
       >
-        <FocusContainer
+        <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
           rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
           isFocused={focusIndex === 5}
@@ -110,7 +111,7 @@ const App: React.FC = () => {
           onTopExit={() => setFocusIndex(3)}
         />
 
-        <FocusContainer
+        <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
           rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
           isFocused={focusIndex === 6}

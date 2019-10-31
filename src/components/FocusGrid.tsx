@@ -1,9 +1,9 @@
 import React, { useState, createRef, useMemo } from 'react';
 
-import { getDirection } from './directions';
-import { FocusItem, IFocusItemProps } from './FocusItem';
-import { getNextGridIndex } from './get-next-grid-index';
-import { useFocus } from '../../hooks/use-focus';
+import { getDirection } from '../constants/directions';
+import { FocusGridItem, IFocusGridItemProps } from './FocusGridItem';
+import { getNextGridIndex, IGridItem } from '../grid';
+import { useFocus } from '../hooks/use-focus';
 
 export interface IColumnConfig {
   width: string;
@@ -13,11 +13,11 @@ interface IRowConfig {
   height: string;
 }
 
-export type ItemsConfig = Pick<IFocusItemProps, 'width'> & {
+export type GridItemConfig = Pick<IFocusGridItemProps, 'width'> & {
   shouldDisable?: boolean;
 };
 
-export interface IFocusContainerProps {
+export interface IFocusGridProps {
   gridGap?: string;
   onDownExit?: () => void;
   onLeftExit?: () => void;
@@ -26,7 +26,7 @@ export interface IFocusContainerProps {
 
   columnConfig: IColumnConfig[];
   isFocused: boolean;
-  items: ItemsConfig[];
+  items: GridItemConfig[];
   rowConfig: IRowConfig[];
 }
 
@@ -36,32 +36,26 @@ const generateColumnTemplate = (columnConfig: IColumnConfig[]) =>
 const generateRowTemplate = (rowConfig: IRowConfig[]) =>
   rowConfig.reduce((accumulator, config) => `${accumulator} ${config.height}`, '');
 
-
-export interface IGridItem {
-  index: number;
-  isDisabled: boolean;
-}
-
 /**
- * In order to accomodate variable-layout grids,
+ * In order to accomodate variable-width layout grids,
  * we need to create an intermediate map that keeps track
  * of the "pseudo-index" of an item that spans multiple indices
  * (consider case where item takes 2 grids, but is a single DOM Node)
  * so pseudo-index 3 is just index 2
  */
-const generateGridMapping = (itemsConfig: ItemsConfig[]) => {
-  const grid: IGridItem[] = [];
+const generateGridMapping = (GridItemConfig: GridItemConfig[]) => {
+  const grid: IGridItem<number>[] = [];
   const gridMap = new Map<number, number>();
 
-  for (let i = 0; i < itemsConfig.length; i++) {
-    const width = itemsConfig[i].width || 1;
+  for (let i = 0; i < GridItemConfig.length; i++) {
+    const width = GridItemConfig[i].width || 1;
     for (let j = 0; j < width; j++) {
       if (!gridMap.has(i)) {
         gridMap.set(i, grid.length);
       }
       grid.push({
-        index: i,
-        isDisabled: !!itemsConfig[i].shouldDisable,
+        value: i,
+        isDisabled: !!GridItemConfig[i].shouldDisable,
       });
     }
   }
@@ -73,10 +67,20 @@ const generateGridMapping = (itemsConfig: ItemsConfig[]) => {
 };
 
 // TODO: Improve to check for right amount of columns too
-const checkIfInvalidConfig = (items: ItemsConfig[], itemsPerRow: number) =>
+const checkIfInvalidConfig = (items: GridItemConfig[], itemsPerRow: number) =>
   !!items.find(item => item.width && item.width > itemsPerRow);
 
-export const FocusContainer = (props: IFocusContainerProps) => {
+/**
+ * This component uses the underlying Grid data structure as well
+ * as CSS Grids to construct focus-able UI.
+ *
+ * The 2 main props to call out are `columnConfig` and `rowColumn`.
+ * They are essentially an array of CSS Grid properties that are used
+ * to layout the grid. The dimensions of the grid are also determined
+ * by these two properties. For example, if `columnConfig` has 2 entries
+ * and `rowColumn` has 5, this will create a 2x5 grid.
+ */
+export const FocusGrid = (props: IFocusGridProps) => {
   const [ focusIndex, setFocusIndex ] = useState(0);
   const [ containerRef, setContainerFocus ] = useFocus();
   const gridTemplateColumns = useMemo(() => generateColumnTemplate(props.columnConfig), [props.columnConfig]);
@@ -103,8 +107,13 @@ export const FocusContainer = (props: IFocusContainerProps) => {
 
         if (direction && typeof gridIndex !== 'undefined') {
           const nextGridIndex = getNextGridIndex(grid, itemsPerRow, gridIndex, direction);
-          const nextFocusIndex = grid[nextGridIndex].index;
+          const nextFocusIndex = grid[nextGridIndex].value;
 
+          /**
+           * If the focus index is unchanged, it means we've hit an edge column.
+           * In that case, we "propagate" the event up, enabling custom behaviors
+           * like inter-grid focusing
+           */
           if (nextFocusIndex === focusIndex) {
             switch (direction) {
               case 'down': {
@@ -153,7 +162,7 @@ export const FocusContainer = (props: IFocusContainerProps) => {
       tabIndex={0}
     >
       {props.items.map((focusItemProps, index) =>
-        <FocusItem
+        <FocusGridItem
           {...focusItemProps}
 
           id={gridMap.get(index) || index}

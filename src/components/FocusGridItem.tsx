@@ -1,8 +1,12 @@
 import React, { forwardRef } from 'react';
 
-import { debounce } from '../../utils/debounce';
+import { debounce } from '../utils/debounce';
 
-export interface IFocusItemProps {
+/**
+ * Simple presentational component to visualize
+ * the state of a given Grid Item (focused, disabled, etc.)
+ */
+export interface IFocusGridItemProps {
   onEnter?: () => void;
   height?: number;
   width?: number;
@@ -14,7 +18,7 @@ export interface IFocusItemProps {
   onHover: () => void;
 }
 
-export const FocusItem = forwardRef<HTMLDivElement, IFocusItemProps>((props, ref) =>(
+export const FocusGridItem = forwardRef<HTMLDivElement, IFocusGridItemProps>((props, ref) =>(
   <div
     className={`focus-item ${props.isDisabled && 'disabled'}`}
     onMouseMove={debounce(() => !props.isDisabled && props.onHover(), 100).handler}

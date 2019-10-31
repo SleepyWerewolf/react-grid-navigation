@@ -1,11 +1,22 @@
-import { Direction } from './directions';
-import { IGridItem } from './FocusContainer';
+/**
+ * This file has 2 primary exports: the `getNextGridIndex` helper and the `IGridItem` interface.
+ *
+ * `getNextGridIndex` composes various other helpers (also defined in this file)
+ * to determine the next item to focus on in a grid, factoring various things like
+ * multi-width layouts and whether grid items are enabled or not.
+ *
+ * `IGridItem` should be used to construct a Grid; it's essentially an array of `IGridItem`s.
+ * It's a simple interface, requiring a generic `value` and a `isDisabled` boolean.
+ * Adjacent grid items with the same `value` are considered to be a single "tile",
+ * which enables variable-width layouts (as opposed to a grid consisting of only single items).
+ * If a GridItem is disabled, it will be passed over in the navigation algorithm.
+ */
 
-const DIRECTIONAL_OFFSETS = {
-  up: -1,
-  down: 1,
-  left: -1,
-  right: 1,
+import { Direction, DIRECTIONAL_OFFSETS } from './constants/directions';
+
+export interface IGridItem<T> {
+  value: T;
+  isDisabled: boolean;
 }
 
 /**
@@ -18,23 +29,23 @@ const DIRECTIONAL_OFFSETS = {
  * getLeftMostIndex(grid, 3) // -> 2
  * getLeftMostIndex(grid, 4) // -> 2
  */
-const getLeftMostIndex = (grid: IGridItem[], index: number) => {
-  const originalItem = grid[index].index;
+const getLeftMostIndex = (grid: IGridItem<number>[], index: number) => {
+  const originalItem = grid[index].value;
   let countIndex = index;
 
-  while (grid[countIndex].index === originalItem && countIndex > 0) {
+  while (grid[countIndex].value === originalItem && countIndex > 0) {
     countIndex--;
   }
 
   return countIndex + 1;
 };
 
-const isBottomRow = (grid: IGridItem[], itemsPerRow: number, index: number) => index >= grid.length - itemsPerRow;
+const isBottomRow = (grid: IGridItem<number>[], itemsPerRow: number, index: number) => index >= grid.length - itemsPerRow;
 const isLeftMostColumn = (itemsPerRow: number, index: number) => (index % itemsPerRow) === 0;
-const isRightMostColumn = (grid: IGridItem[], itemsPerRow: number, index: number) =>  index % itemsPerRow === itemsPerRow - 1 || index === grid.length - 1;
+const isRightMostColumn = (grid: IGridItem<number>[], itemsPerRow: number, index: number) =>  index % itemsPerRow === itemsPerRow - 1 || index === grid.length - 1;
 const isTopRow = (itemsPerRow: number, index: number) => index <= itemsPerRow - 1;
 
-const isEdgeColumn = (grid: IGridItem[], itemsPerRow: number, index: number, direction: Direction) => {
+const isEdgeColumn = (grid: IGridItem<number>[], itemsPerRow: number, index: number, direction: Direction) => {
   switch (direction) {
     case 'up': return isTopRow(itemsPerRow, index);
     case 'down': return isBottomRow(grid, itemsPerRow, index);
@@ -48,7 +59,7 @@ const isEdgeColumn = (grid: IGridItem[], itemsPerRow: number, index: number, dir
  * Given a direction (left or right), this function iterates through
  * a row until it finds a new grid item that is not disabled.
  */
-const getAvailableAdjacentIndex = (grid: IGridItem[], itemsPerRow: number, startingIndex: number, direction: 'left' | 'right') => {
+const getAvailableAdjacentIndex = (grid: IGridItem<number>[], itemsPerRow: number, startingIndex: number, direction: 'left' | 'right') => {
   let newIndex = startingIndex;
   let countIndex = newIndex;
   const offset = DIRECTIONAL_OFFSETS[direction];
@@ -56,7 +67,7 @@ const getAvailableAdjacentIndex = (grid: IGridItem[], itemsPerRow: number, start
   while (!!grid[countIndex] && !isEdgeColumn(grid, itemsPerRow, countIndex, direction)) {
     const offsetIndex = countIndex + offset;
 
-    if (!!grid[offsetIndex] && !grid[offsetIndex].isDisabled && grid[offsetIndex].index !== grid[startingIndex].index) {
+    if (!!grid[offsetIndex] && !grid[offsetIndex].isDisabled && grid[offsetIndex].value !== grid[startingIndex].value) {
       newIndex = offsetIndex;
       break;
     }
@@ -71,7 +82,7 @@ const getAvailableAdjacentIndex = (grid: IGridItem[], itemsPerRow: number, start
  * Given a direction (up or down), this function finds an enabled item
  * on a row in the given direction. 
  */
-const getAvailableVerticalIndex = (grid: IGridItem[], itemsPerRow: number, startingIndex: number, direction: 'up' | 'down') => {
+const getAvailableVerticalIndex = (grid: IGridItem<number>[], itemsPerRow: number, startingIndex: number, direction: 'up' | 'down') => {
   let newIndex = startingIndex;
   const offset = DIRECTIONAL_OFFSETS[direction];
 
@@ -99,7 +110,12 @@ const getAvailableVerticalIndex = (grid: IGridItem[], itemsPerRow: number, start
   return newIndex;
 }
 
-export const getNextGridIndex = (grid: IGridItem[], itemsPerRow: number, startingIndex: number, direction: Direction) => {
+/**
+ * Given a direction (up, down, left, right), this function iterates through
+ * a grid to find the next item to receive focus, factoring in layouts with
+ * variable widths and the fact that grid items can be disabled.
+ */
+export const getNextGridIndex = (grid: IGridItem<number>[], itemsPerRow: number, startingIndex: number, direction: Direction) => {
   switch (direction) {
     case 'up': return getAvailableVerticalIndex(grid, itemsPerRow, startingIndex, 'up');
     case 'down': return getAvailableVerticalIndex(grid, itemsPerRow, startingIndex, 'down');
