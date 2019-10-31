@@ -9,46 +9,57 @@ const App: React.FC = () => {
   return (
     <Fragment>
       <h1>Standard 4x4 Grid</h1>
-      <FocusGrid
-        columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
-        rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
-        isFocused={focusIndex === 0}
-        items={[
-          {}, {}, {}, {},
-          {}, {}, {}, {},
-          {}, {}, {}, {},
-          {}, {}, {}, {},
-        ]}
-        onDownExit={() => setFocusIndex(1)}
-      />
+      <h2>Hover over any of the grids to see focus change; click on a grid to be able to navigate it with keyboard!</h2>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+        <FocusGrid
+          columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
+          isFocused={true}
+          items={[
+            {}, {}, {}, {},
+            {}, {}, {}, {},
+            {}, {}, {}, {},
+            {}, {}, {}, {},
+          ]}
+        />
+      </div>
 
       <h1>Variable-Width Layout Grid</h1>
-      <FocusGrid
-        columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
-        rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
-        isFocused={focusIndex === 1}
-        items={[
-          {}, { width: 2 },
-          { width: 2 }, {},
-          {}, {}, {},
-        ]}
-        onDownExit={() => setFocusIndex(2)}
-        onTopExit={() => setFocusIndex(0)}
-      />
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+        <FocusGrid
+          columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
+          isFocused={false}
+          items={[
+            {}, { width: 2 },
+            { width: 2 }, {},
+            {}, {}, {},
+          ]}
+        />
+      </div>
 
       <h1>Disabled Grid Items</h1>
-      <FocusGrid
-        columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
-        rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
-        isFocused={focusIndex === 2}
-        items={[
-          {}, { width: 2 }, { shouldDisable: true },
-          { width: 2, shouldDisable: true }, {}, {},
-          { shouldDisable: true }, {}, { shouldDisable: true }, {},
-        ]}
-        onDownExit={() => setFocusIndex(3)}
-        onTopExit={() => setFocusIndex(1)}
-      />
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}>
+        <FocusGrid
+          columnConfig={[{ width: '1fr' }, { width: '1fr' }, { width: '1fr' }, { width: '1fr' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
+          isFocused={false}
+          items={[
+            {}, { width: 2 }, { shouldDisable: true },
+            { width: 2, shouldDisable: true }, {}, {},
+            { shouldDisable: true }, {}, { shouldDisable: true }, {},
+          ]}
+        />
+      </div>
 
       <h1>Inter-Grid Focus</h1>
       <div
@@ -60,7 +71,7 @@ const App: React.FC = () => {
       >
         <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
-          rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
           isFocused={focusIndex === 3}
           items={[
             {}, {},
@@ -68,14 +79,12 @@ const App: React.FC = () => {
             {}, {},
             {}, {},
           ]}
-          onDownExit={() => setFocusIndex(5)}
           onRightExit={() => setFocusIndex(4)}
-          onTopExit={() => setFocusIndex(2)}
         />
 
         <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
-          rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
           isFocused={focusIndex === 4}
           items={[
             {}, {},
@@ -83,9 +92,7 @@ const App: React.FC = () => {
             {}, {},
             {}, {},
           ]}
-          onDownExit={() => setFocusIndex(6)}
           onLeftExit={() => setFocusIndex(3)}
-          onTopExit={() => setFocusIndex(2)}
         />
       </div>
 
@@ -99,7 +106,7 @@ const App: React.FC = () => {
       >
         <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
-          rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
           isFocused={focusIndex === 5}
           items={[
             { width: 2 },
@@ -108,12 +115,11 @@ const App: React.FC = () => {
             {}, {},
           ]}
           onRightExit={() => setFocusIndex(6)}
-          onTopExit={() => setFocusIndex(3)}
         />
 
         <FocusGrid
           columnConfig={[{ width: '1fr' }, { width: '1fr' }]}
-          rowConfig={[{ height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }, { height: 'minmax(250px, auto)' }]}
+          rowConfig={[{ height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }, { height: 'minmax(150px, auto)' }]}
           isFocused={focusIndex === 6}
           items={[
             {}, {},
@@ -122,7 +128,6 @@ const App: React.FC = () => {
             {}, {},
           ]}
           onLeftExit={() => setFocusIndex(5)}
-          onTopExit={() => setFocusIndex(4)}
         />
       </div>
     </Fragment>

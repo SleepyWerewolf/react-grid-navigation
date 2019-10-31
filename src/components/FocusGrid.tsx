@@ -101,7 +101,10 @@ export const FocusGrid = (props: IFocusGridProps) => {
   return (
     <div
       className='focus-container'
-      onKeyDownCapture={({ key }) => {
+      onKeyDownCapture={event => {
+        event.preventDefault();
+
+        const { key } = event;
         const direction = getDirection(key.toLowerCase());
         const gridIndex = gridMap.get(focusIndex);
 
@@ -150,14 +153,14 @@ export const FocusGrid = (props: IFocusGridProps) => {
       }}
       ref={containerRef as React.RefObject<HTMLDivElement>}
       style={{
-        border: '3px solid black',
+        borderRadius: '.3em',
         display: 'grid',
         gridTemplateColumns,
         gridTemplateRows,
-        gridGap: props.gridGap || '5px',
+        gridGap: props.gridGap || '15px',
         margin: '10px',
-        padding: '5px',
-        width: '100%',
+        padding: '50px',
+        width: '75vh',
       }}
       tabIndex={0}
     >
@@ -166,7 +169,7 @@ export const FocusGrid = (props: IFocusGridProps) => {
           {...focusItemProps}
 
           id={gridMap.get(index) || index}
-          isActive={focusIndex === index}
+          isFocused={focusIndex === index}
           isDisabled={!!focusItemProps.shouldDisable}
           itemsPerRow={itemsPerRow}
           key={index}

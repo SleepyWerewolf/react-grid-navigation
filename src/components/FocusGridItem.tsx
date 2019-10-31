@@ -12,7 +12,7 @@ export interface IFocusGridItemProps {
   width?: number;
 
   id: number;
-  isActive: boolean;
+  isFocused: boolean;
   isDisabled: boolean;
   itemsPerRow: number;
   onHover: () => void;
@@ -24,7 +24,8 @@ export const FocusGridItem = forwardRef<HTMLDivElement, IFocusGridItemProps>((pr
     onMouseMove={debounce(() => !props.isDisabled && props.onHover(), 100).handler}
     ref={ref}
     style={{
-      border: `${props.isActive ? 4 : 1}px solid ${props.isDisabled ? 'grey' : 'black'}`,
+      backgroundColor: `${props.isDisabled ? '#ff3e00' : (props.isFocused ? '#40b3ff' : '#676778')}`,
+      borderRadius: '.4em',
       gridColumn: props.width && `${(props.id % props.itemsPerRow) + 1} / span ${props.width}`,
       gridRow: props.height && `${props.id + 1} / span ${props.height}`,
     }}
