@@ -62,6 +62,7 @@ const App: React.FC = () => {
       </div>
 
       <h1>Inter-Grid Focus</h1>
+      <h2>Try navigating between the two grids below!</h2>
       <div
         style={{
           display: 'flex',
