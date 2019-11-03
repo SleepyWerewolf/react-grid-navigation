@@ -9,7 +9,7 @@ const App: React.FC = () => {
   return (
     <Fragment>
       <h1>Standard 4x4 Grid</h1>
-      <h2>Hover over any of the grids to see focus change; click on a grid to be able to navigate it with keyboard!</h2>
+      <h2>Hover over any of the grids to see focus change. You can also use WASD or Arroy Keys to navigate once the grid is focused!</h2>
       <div style={{
         display: 'flex',
         justifyContent: 'center',

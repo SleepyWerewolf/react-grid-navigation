@@ -151,6 +151,7 @@ export const FocusGrid = (props: IFocusGridProps) => {
           }
         }
       }}
+      onMouseMove={() => setContainerFocus()}
       ref={containerRef as React.RefObject<HTMLDivElement>}
       style={{
         borderRadius: '.3em',
@@ -175,7 +176,7 @@ export const FocusGrid = (props: IFocusGridProps) => {
           key={index}
           onHover={() => {
             if (focusIndex !== index) {
-              setFocusIndex(index)
+              setFocusIndex(index);
             }
           }}
           ref={refs[index]}
