@@ -4,6 +4,7 @@ import { getDirection } from '../constants/directions';
 import { FocusGridItem, IFocusGridItemProps } from './FocusGridItem';
 import { getNextGridIndex, IGridItem } from '../grid';
 import { useFocus } from '../hooks/use-focus';
+import { debounce } from '../utils/debounce';
 
 export interface IColumnConfig {
   width: string;
@@ -89,6 +90,10 @@ export const FocusGrid = (props: IFocusGridProps) => {
   const refs = props.items.map(() => createRef<HTMLDivElement>());
   const itemsPerRow = props.columnConfig.length;
   const isInvalidConfig = useMemo(() => checkIfInvalidConfig(props.items, itemsPerRow), [props.items, itemsPerRow]);
+  const {
+    cancel: debouncedHoverCanceler,
+    handler: debouncedHoverHandler,
+  } = debounce(() => setContainerFocus(), 100);
 
   if (props.isFocused) {
     setContainerFocus();
@@ -151,7 +156,8 @@ export const FocusGrid = (props: IFocusGridProps) => {
           }
         }
       }}
-      onMouseMove={() => setContainerFocus()}
+      onMouseLeave={debouncedHoverCanceler}
+      onMouseMove={debouncedHoverHandler}
       ref={containerRef as React.RefObject<HTMLDivElement>}
       style={{
         borderRadius: '.3em',
